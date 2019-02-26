@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import co.getdere.chatapp.Controller.App
 import co.getdere.chatapp.Model.Channel
+import co.getdere.chatapp.Model.Message
 import co.getdere.chatapp.Utilities.URL_GET_CHANNELS
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
@@ -14,6 +15,7 @@ import org.json.JSONException
 object MessageService {
 
     val channels = ArrayList<Channel>()
+    val messages = ArrayList<Message>()
 
     fun getChannels(complete: (Boolean) -> Unit) {
 

@@ -1,7 +1,6 @@
 package co.getdere.chatapp.Adapters
 
 import android.content.Context
-import android.support.v4.view.GravityCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import android.widget.TextView
 import co.getdere.chatapp.Model.Channel
 import co.getdere.chatapp.R
 import co.getdere.chatapp.Services.ChannelName
-import kotlinx.android.synthetic.main.activity_main.view.*
 
 class ChannelsAdapter(val context: Context, val channels: ArrayList<Channel>) :
     RecyclerView.Adapter<ChannelsAdapter.Holder>() {
@@ -32,9 +30,6 @@ class ChannelsAdapter(val context: Context, val channels: ArrayList<Channel>) :
         holder.itemView.setOnClickListener {
 
             ChannelName.activeChannel = channels[position]
-
-            holder.mainLayout.drawer_layout.closeDrawer(GravityCompat.START)
-
         }
 
     }

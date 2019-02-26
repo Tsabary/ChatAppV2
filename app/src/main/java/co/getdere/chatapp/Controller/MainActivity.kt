@@ -12,22 +12,20 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import co.getdere.chatapp.Adapters.ChannelsAdapter
 import co.getdere.chatapp.Model.Channel
+import co.getdere.chatapp.Model.Message
 import co.getdere.chatapp.R
 import co.getdere.chatapp.Services.AuthService
 import co.getdere.chatapp.Services.ChannelName
 import co.getdere.chatapp.Services.UserDataService
 import co.getdere.chatapp.Services.MessageService
 import co.getdere.chatapp.Utilities.BROADCAST_USER_DATA_CHANGE
-import co.getdere.chatapp.Utilities.ChannelClickListener
 import co.getdere.chatapp.Utilities.SOCKET_URL
 import io.socket.client.IO
 import io.socket.emitter.Emitter
@@ -40,8 +38,11 @@ import kotlinx.android.synthetic.main.nav_header_main.*
 class MainActivity : AppCompatActivity() {
 
     val socket = IO.socket(SOCKET_URL)
+    lateinit var channelTitle: TextView
+
 
     lateinit var channelsAdapter: ChannelsAdapter
+    lateinit var channelsLayoutManager : LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,38 +59,33 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
 
 
-        val channelsLayoutManager = LinearLayoutManager(this)
-        channel_list.layoutManager = channelsLayoutManager
+        channelsLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         channelsAdapter = ChannelsAdapter(this, MessageService.channels)
+
+        channel_list.layoutManager = channelsLayoutManager
         channel_list.adapter = channelsAdapter
         //takes care of the recycler view of the channel list
 
         socket.connect()
         socket.on("channelCreated", onNewChannel)
         //taps in to the socket to "listen" for creation of new channels
+        socket.on("messageCreated", onNewMessage)
+        //taps in to the socket to "listen" for creation of new channels
 
 
-        if (App.prefs.isLoggedIn){
+        if (App.prefs.isLoggedIn) {
             AuthService.findUserByEmail(this, {})
         }
         // Checks if the user s logged in already in App.prefs (shared preferences) and if so logs them in again automatically using the findUserByEmail function
 
+        channelTitle = findViewById(R.id.main_channel_name)
 
+        ChannelName.addChannelNameChangedListener {
+            // Do your operation
+            drawer_layout.closeDrawer(GravityCompat.START)
+            channelTitle.text = "#${ChannelName.activeChannel?.name}"
 
-
-        channel_list.addOnItemTouchListener(RecyclerTouchListener(this,
-            channel_list, object : ChannelClickListener {
-                override fun onClick(view:View, position:Int) {
-                    //Values are passing to activity & to fragment as well
-                    Toast.makeText(parent, "Single Click on position :" + position,
-                        Toast.LENGTH_SHORT).show()
-                }
-
-            }))
-
-
-
-
+        }
 
 
     }
@@ -143,9 +139,11 @@ class MainActivity : AppCompatActivity() {
 
     fun updateWithChannel() {
 
-        main_channel_name.text = "#${ChannelName.activeChannel?.name}" //change the "please login" to the name of the selected channel
+        main_channel_name.text =
+            "#${ChannelName.activeChannel?.name}" //change the "please login" to the name of the selected channel
 
     }
+
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
@@ -215,8 +213,47 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val onNewMessage = Emitter.Listener { args ->
+        runOnUiThread {
+
+            val message = args[0] as String
+            val channelId = args[2] as String
+            val userName = args[3] as String
+            val userAvatar = args[4] as String
+            val userAvatarColor = args[5] as String
+            val id = args[6] as String
+            val timeStamp = args[7] as String
+
+            val newMessage = Message(message,channelId,userName, userAvatar, userAvatarColor, id, timeStamp)
+            MessageService.messages.add(newMessage)
+            println(newMessage.message)
+
+        }
+    }
+
     fun sendMessageBtnClicked(view: View) {
-        hideKeyboard()
+
+        if (App.prefs.isLoggedIn && channelTitle.text.isNotEmpty()) {
+
+            val userId = UserDataService.id
+            val channelId = ChannelName.activeChannel!!.id
+
+            socket.emit(
+                "newMessage",
+                msg_text_field.text.toString(),
+                userId,
+                channelId,
+                UserDataService.name,
+                UserDataService.avatarName,
+                UserDataService.avatarColor
+            )
+
+            msg_text_field.text.clear()
+            hideKeyboard()
+
+        }
+
+
     }
 
     fun hideKeyboard() {
@@ -226,34 +263,5 @@ class MainActivity : AppCompatActivity() {
             inputManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         }
     }
-
-
-    internal class RecyclerTouchListener(context:Context, recycleView: RecyclerView, clickListener: ChannelClickListener):RecyclerView.OnItemTouchListener {
-        private val clicklistener: ChannelClickListener
-        private val gestureDetector: GestureDetector
-        init{
-            this.clicklistener = clickListener
-            gestureDetector = GestureDetector(context, object:GestureDetector.SimpleOnGestureListener() {
-                override fun onSingleTapUp(e: MotionEvent):Boolean {
-                    return true
-                }
-            })
-        }
-        override fun onInterceptTouchEvent(rv:RecyclerView, e:MotionEvent):Boolean {
-            val child = rv.findChildViewUnder(e.x, e.y)
-            if (child != null && clicklistener != null && gestureDetector.onTouchEvent(e))
-            {
-                clicklistener.onClick(child, rv.getChildAdapterPosition(child))
-            }
-            return false
-        }
-        override fun onTouchEvent(rv:RecyclerView, e:MotionEvent) {
-        }
-        override fun onRequestDisallowInterceptTouchEvent(disallowIntercept:Boolean) {
-        }
-    }
-
-
-
 
 }

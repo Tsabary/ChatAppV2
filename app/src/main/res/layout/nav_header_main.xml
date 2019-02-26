@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nav_header_height"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        android:gravity="bottom"
+        android:id="@+id/linearLayout">
+
+    <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            app:srcCompat="@drawable/profiledefault"
+            android:contentDescription="@string/nav_header_desc"
+            android:id="@+id/user_image_nav_header"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/login_button_nav_header"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:id="@+id/user_name_nav_header"
+            tools:text="Yanay Z"
+            android:textColor="@android:color/background_light"
+            app:layout_constraintTop_toTopOf="@+id/user_image_nav_header"
+            app:layout_constraintBottom_toTopOf="@+id/user_email_nav_header"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@+id/user_email_nav_header"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/user_email_nav_header"
+            tools:text="yan@gmail.com"
+            android:textColor="@android:color/background_light"
+            app:layout_constraintTop_toBottomOf="@+id/user_name_nav_header"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/user_image_nav_header"
+            app:layout_constraintStart_toEndOf="@+id/user_image_nav_header"
+            android:layout_marginStart="8dp"/>
+    <TextView
+            android:text="LOGIN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/login_button_nav_header"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/user_image_nav_header"
+            android:background="@android:color/transparent"
+            android:textColor="@android:color/background_light"
+            android:onClick="LoginBtnNavClicked"
+            app:layout_constraintEnd_toEndOf="@+id/user_image_nav_header"/>
+    <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:srcCompat="@drawable/addchannelbutton"
+            android:id="@+id/add_channel_btn"
+            android:scaleType="fitXY"
+            android:padding="5dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:onClick="addChannelClicked"/>
+
+</android.support.constraint.ConstraintLayout>

@@ -8,6 +8,4 @@ class Message(
     val userAvatarColor: String,
     val id: String,
     val timeStamp: String
-) {
-
-}
+)

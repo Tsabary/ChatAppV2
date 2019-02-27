@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="wrap_content">
+
+    <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            tools:srcCompat="@tools:sample/avatars[0]"
+            android:id="@+id/imageView"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/msg_writer"
+            app:layout_constraintStart_toEndOf="@+id/imageView"
+            android:layout_marginStart="16dp"
+            app:layout_constraintTop_toTopOf="@+id/imageView"
+            tools:text="Name name"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/msg_body"
+            app:layout_constraintStart_toEndOf="@+id/imageView"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            android:layout_marginBottom="8dp"
+            tools:text="msg msg msg msg"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintHorizontal_bias="0.0"
+            android:singleLine="false"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/msg_date"
+            app:layout_constraintStart_toEndOf="@+id/msg_writer"
+            android:layout_marginStart="24dp"
+            app:layout_constraintBottom_toBottomOf="@+id/msg_writer"
+            app:layout_constraintTop_toTopOf="@+id/msg_writer"
+            tools:text="date date"/>
+</android.support.constraint.ConstraintLayout>

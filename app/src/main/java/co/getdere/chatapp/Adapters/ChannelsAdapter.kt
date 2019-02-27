@@ -17,7 +17,6 @@ class ChannelsAdapter(val context: Context, val channels: ArrayList<Channel>) :
     inner class Holder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val singleChannel = itemView.findViewById<TextView>(R.id.single_channel)
 
-        val mainLayout = LayoutInflater.from(context).inflate(R.layout.activity_main, null)
 
         fun bindText(textVar: String, context: Context) {
             singleChannel.text = textVar

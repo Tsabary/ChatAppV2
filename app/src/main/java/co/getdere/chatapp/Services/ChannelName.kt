@@ -9,10 +9,10 @@ object ChannelName {
         listeners.add(listener)
 
     }
-
-    fun removeChannelNameChangedListener(listener: (Channel?) -> Unit) {
-        listeners.remove(listener)
-    }
+//
+//    fun removeChannelNameChangedListener(listener: (Channel?) -> Unit) {
+//        listeners.remove(listener)
+//    }
 
     var activeChannel: Channel? = null
         set(value) {

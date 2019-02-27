@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
 
     lateinit var channelsAdapter: ChannelsAdapter
-    lateinit var channelsLayoutManager : LinearLayoutManager
+    lateinit var channelsLayoutManager: LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         socket.on("channelCreated", onNewChannel)
         //taps in to the socket to "listen" for creation of new channels
         socket.on("messageCreated", onNewMessage)
-        //taps in to the socket to "listen" for creation of new channels
+        //taps in to the socket to "listen" for creation of new messages
 
 
         if (App.prefs.isLoggedIn) {
@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
             // Do your operation
             drawer_layout.closeDrawer(GravityCompat.START)
             channelTitle.text = "#${ChannelName.activeChannel?.name}"
+            updateWithChannel()
 
         }
 
@@ -98,14 +99,17 @@ class MainActivity : AppCompatActivity() {
                 BROADCAST_USER_DATA_CHANGE
             )
         )
-        //Broadcasts there was a data change (or perhaps there wasn't but there is a need to let the app know it needs to check for the existing data?)
+        /*Broadcasts there was a data change
+        (or perhaps there wasn't but there is a need to let the app know it needs to check for the existing data?)
+         */
 
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        socket.disconnect() // disconnects the socket on destroy, probably to save memory
+        socket.disconnect()
+        // disconnects the socket on destroy, probably to save memory
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangeReceiver)
         // disconnects the broadcaster on destroy, probably to save memory
@@ -125,11 +129,11 @@ class MainActivity : AppCompatActivity() {
 
                 MessageService.getChannels({ complete ->
                     if (complete) {
-                        if (MessageService.channels.count() > 0)//checks if there are existing channels
+                        if (MessageService.channels.count() > 0)
+                        //checks if there are existing channels
                         {
                             ChannelName.activeChannel = MessageService.channels[0]
                             channelsAdapter.notifyDataSetChanged()
-                            updateWithChannel()
                         }
                     }
                 })
@@ -139,8 +143,19 @@ class MainActivity : AppCompatActivity() {
 
     fun updateWithChannel() {
 
-        main_channel_name.text =
-            "#${ChannelName.activeChannel?.name}" //change the "please login" to the name of the selected channel
+        main_channel_name.text = "#${ChannelName.activeChannel?.name}"
+        //change the "please login" to the name of the selected channel
+
+        if (ChannelName.activeChannel != null) {
+            MessageService.getMessages(ChannelName.activeChannel!!.id, { complete ->
+                if (complete) {
+                    for (message in MessageService.messages) {
+                        println(message.message)
+                    }
+                }
+            })
+        }
+
 
     }
 
@@ -152,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun LoginBtnNavClicked(view: View) {
+    fun loginBtnNavClicked(view: View) {
 
         if (App.prefs.isLoggedIn) {
             UserDataService.logOut()
@@ -177,7 +192,7 @@ class MainActivity : AppCompatActivity() {
             val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
 
             builder.setView(dialogView)
-                .setPositiveButton("Add", { dialogInterface, i ->
+                .setPositiveButton("Add", { _, _ ->
                     val nameTextView = dialogView.findViewById<EditText>(R.id.add_channel_name_text)
                     val descriptionTextView = dialogView.findViewById<EditText>(R.id.add_channel_description_text)
 
@@ -189,7 +204,7 @@ class MainActivity : AppCompatActivity() {
                     channelsAdapter.notifyDataSetChanged()
 
                 }
-                ).setNegativeButton("Cancel", { dialogInterface, i ->
+                ).setNegativeButton("Cancel", { _, _ ->
 
                     hideKeyboard()
                 })
@@ -201,35 +216,48 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val onNewChannel = Emitter.Listener { args ->
-        runOnUiThread {
 
-            val channelName = args[0] as String
-            val channelDescription = args[1] as String
-            val channelId = args[2] as String
+        if (App.prefs.isLoggedIn) {
+            runOnUiThread {
 
-            val newChannel = Channel(channelName, channelDescription, channelId)
+                val channelName = args[0] as String
+                val channelDescription = args[1] as String
+                val channelId = args[2] as String
 
-            MessageService.channels.add(newChannel)
+                val newChannel = Channel(channelName, channelDescription, channelId)
+
+                MessageService.channels.add(newChannel)
+            }
         }
     }
 
     private val onNewMessage = Emitter.Listener { args ->
-        runOnUiThread {
+        if (App.prefs.isLoggedIn) {
+            runOnUiThread {
 
-            val message = args[0] as String
-            val channelId = args[2] as String
-            val userName = args[3] as String
-            val userAvatar = args[4] as String
-            val userAvatarColor = args[5] as String
-            val id = args[6] as String
-            val timeStamp = args[7] as String
+                val channelId = args[2] as String
+                if (channelId == ChannelName.activeChannel?.id) {
 
-            val newMessage = Message(message,channelId,userName, userAvatar, userAvatarColor, id, timeStamp)
-            MessageService.messages.add(newMessage)
-            println(newMessage.message)
+                    val message = args[0] as String
+                    val userName = args[3] as String
+                    val userAvatar = args[4] as String
+                    val userAvatarColor = args[5] as String
+                    val id = args[6] as String
+                    val timeStamp = args[7] as String
+
+                    val newMessage = Message(message, channelId, userName, userAvatar, userAvatarColor, id, timeStamp)
+                    MessageService.messages.add(newMessage)
+                }
+
+            }
+
 
         }
-    }
+    } /*This function adds new messages to the array of messages.
+    It is used when the socket listener receives a signal/information that there is a new message.
+    It then checks if the message's channel id (the channel it was sent to) is the same at the current channel the user is on.
+    if it is then it adds it to the array of messages.
+    THe reason it makes the channel check first is because our array only holds the messages of the current selected channel*/
 
     fun sendMessageBtnClicked(view: View) {
 
@@ -256,7 +284,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun hideKeyboard() {
+    private fun hideKeyboard() {
         val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         if (inputManager.isAcceptingText) {

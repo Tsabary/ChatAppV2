@@ -67,12 +67,16 @@ class MainActivity : AppCompatActivity() {
         messagesAdapter = MessagesAdapter(this, MessageService.messages)
         //takes care of the recycler view of the messages in the chat
 
+        msg_list_view.adapter = messagesAdapter
+        msg_list_view.layoutManager = messageLayoutManager
+
         channelsLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         channelsAdapter = ChannelsAdapter(this, MessageService.channels)
 
         channel_list.layoutManager = channelsLayoutManager
         channel_list.adapter = channelsAdapter
         //takes care of the recycler view of the channel list
+
 
         socket.connect()
         socket.on("channelCreated", onNewChannel)
@@ -157,8 +161,10 @@ class MainActivity : AppCompatActivity() {
         if (ChannelName.activeChannel != null) {
             MessageService.getMessages(ChannelName.activeChannel!!.id, { complete ->
                 if (complete) {
-                    for (message in MessageService.messages) {
-                        println(message.messageBody)
+                    messagesAdapter.notifyDataSetChanged()
+
+                    if (messagesAdapter.itemCount > 0 ){
+                        msg_list_view.smoothScrollToPosition(messagesAdapter.itemCount - 1)
                     }
                 }
             })
@@ -178,6 +184,8 @@ class MainActivity : AppCompatActivity() {
     fun loginBtnNavClicked(view: View) {
 
         if (App.prefs.isLoggedIn) {
+            channelsAdapter.notifyDataSetChanged()
+            messagesAdapter.notifyDataSetChanged()
             UserDataService.logOut()
             login_button_nav_header.text = getString(R.string.Login)
             user_email_nav_header.text = ""
@@ -210,6 +218,8 @@ class MainActivity : AppCompatActivity() {
                     socket.emit("newChannel", channelName, channelDescription)
 
                     channelsAdapter.notifyDataSetChanged()
+                    hideKeyboard()
+
 
                 }
                 ).setNegativeButton("Cancel", { _, _ ->
@@ -235,6 +245,8 @@ class MainActivity : AppCompatActivity() {
                 val newChannel = Channel(channelName, channelDescription, channelId)
 
                 MessageService.channels.add(newChannel)
+
+                channelsAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -255,6 +267,9 @@ class MainActivity : AppCompatActivity() {
 
                     val newMessage = Message(message, channelId, userName, userAvatar, userAvatarColor, id, timeStamp)
                     MessageService.messages.add(newMessage)
+
+                    messagesAdapter.notifyDataSetChanged()
+                    msg_list_view.smoothScrollToPosition(messagesAdapter.itemCount - 1)
                 }
 
             }

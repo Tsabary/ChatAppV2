@@ -3,7 +3,8 @@
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
-                                             android:layout_height="wrap_content">
+                                             android:layout_height="wrap_content"
+                                             android:layout_marginEnd="16dp">
 
     <ImageView
             android:layout_width="60dp"
@@ -21,20 +22,21 @@
             app:layout_constraintStart_toEndOf="@+id/msg_avatar"
             android:layout_marginStart="16dp"
             app:layout_constraintTop_toTopOf="@+id/msg_avatar"
-            tools:text="Name name"/>
+            tools:text="Name name"
+    />
     <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/msg_body"
             app:layout_constraintStart_toEndOf="@+id/msg_avatar"
             android:layout_marginStart="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/msg_avatar"
-            android:layout_marginBottom="8dp"
-            tools:text="msg msg msg msg"
+            tools:text="After a wide range of medium texture experiments, here is the result!!! Elk Woods are in relief and I added a touch of airbrush for the light and the golden triangle tan in transparency! I started this canvas in October, it smells like autumn, don't you think?"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"
             app:layout_constraintHorizontal_bias="0.0"
-            android:singleLine="false"/>
+            android:singleLine="false"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/msg_writer"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,5 +45,6 @@
             android:layout_marginStart="24dp"
             app:layout_constraintBottom_toBottomOf="@+id/msg_writer"
             app:layout_constraintTop_toTopOf="@+id/msg_writer"
-            tools:text="date date"/>
+            tools:text="date date"
+    />
 </android.support.constraint.ConstraintLayout>

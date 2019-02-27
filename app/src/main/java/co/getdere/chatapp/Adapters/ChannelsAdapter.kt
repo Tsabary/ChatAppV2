@@ -39,8 +39,7 @@ class ChannelsAdapter(val context: Context, val channels: ArrayList<Channel>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChannelsAdapter.Holder {
 
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.channel_list_layout, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.channel_list_layout, parent, false)
         return Holder(view)
 
     }

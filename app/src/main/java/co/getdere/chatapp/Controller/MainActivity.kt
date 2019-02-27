@@ -18,6 +18,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import co.getdere.chatapp.Adapters.ChannelsAdapter
+import co.getdere.chatapp.Adapters.MessagesAdapter
 import co.getdere.chatapp.Model.Channel
 import co.getdere.chatapp.Model.Message
 import co.getdere.chatapp.R
@@ -44,6 +45,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var channelsAdapter: ChannelsAdapter
     lateinit var channelsLayoutManager: LinearLayoutManager
 
+    lateinit var messagesAdapter: MessagesAdapter
+    lateinit var messageLayoutManager: LinearLayoutManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -58,6 +62,10 @@ class MainActivity : AppCompatActivity() {
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
+
+        messageLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        messagesAdapter = MessagesAdapter(this, MessageService.messages)
+        //takes care of the recycler view of the messages in the chat
 
         channelsLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         channelsAdapter = ChannelsAdapter(this, MessageService.channels)
@@ -150,7 +158,7 @@ class MainActivity : AppCompatActivity() {
             MessageService.getMessages(ChannelName.activeChannel!!.id, { complete ->
                 if (complete) {
                     for (message in MessageService.messages) {
-                        println(message.message)
+                        println(message.messageBody)
                     }
                 }
             })
@@ -254,8 +262,8 @@ class MainActivity : AppCompatActivity() {
 
         }
     } /*This function adds new messages to the array of messages.
-    It is used when the socket listener receives a signal/information that there is a new message.
-    It then checks if the message's channel id (the channel it was sent to) is the same at the current channel the user is on.
+    It is used when the socket listener receives a signal/information that there is a new messageBody.
+    It then checks if the messageBody's channel id (the channel it was sent to) is the same at the current channel the user is on.
     if it is then it adds it to the array of messages.
     THe reason it makes the channel check first is because our array only holds the messages of the current selected channel*/
 

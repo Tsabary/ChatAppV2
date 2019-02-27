@@ -1,7 +1,7 @@
 package co.getdere.chatapp.Model
 
 class Message(
-    val message: String,
+    val messageBody: String,
     val channelId: String,
     val userName: String,
     val userAvatar: String,
